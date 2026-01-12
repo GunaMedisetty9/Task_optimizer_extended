@@ -184,40 +184,148 @@ if page == "🏠 Dashboard":
             plt.xticks(rotation=0)
             st.pyplot(fig)
 
-# PAGE 2: EMOTION DETECTOR
+# ==================== PAGE 2: EMOTION DETECTOR (ENHANCED) ====================
 elif page == "🎭 Emotion Detector":
-    st.header("🎭 Emotion Detection")
+    st.header("🎭 Real-Time Emotion Detection")
+    st.markdown("*NLP-powered sentiment analysis with advanced visualizations*")
     
-    col1, col2 = st.columns([2, 1])
+    col1, col2 = st.columns([3, 2])
+    
     with col1:
-        user_text = st.text_area("How are you feeling?", height=150)
-        workload_input = st.slider("Workload (1-10)", 1, 10, 5)
+        st.subheader("📝 Enter Your Text")
+        user_text = st.text_area(
+            "How are you feeling today?", 
+            height=150,
+            placeholder="Example: I'm feeling great about finishing this project ahead of schedule!",
+            key='emotion_text'
+        )
         
-        if st.button("🔍 Analyze", type="primary"):
-            if user_text:
-                result = detect_emotion(user_text, workload_input)
-                
-                st.markdown("---")
-                mood_colors = {'Happy':'green', 'Calm':'blue', 'Neutral':'gray', 'Tired':'orange', 'Stressed':'red'}
-                
-                col_a, col_b, col_c = st.columns(3)
-                with col_a:
-                    st.metric("Mood", result['mood'])
-                with col_b:
-                    st.metric("Confidence", f"{result['confidence']*100:.0f}%")
-                with col_c:
-                    st.metric("Sentiment", f"{result['sentiment_score']:+.3f}")
-                
-                if result['mood'] == 'Stressed':
-                    st.error("⚠️ High Stress Detected! Take a break.")
-                elif result['mood'] == 'Happy':
-                    st.success("✅ Great mood! Perfect for complex work.")
-            else:
-                st.warning("Please enter text")
+        col_a, col_b = st.columns(2)
+        with col_a:
+            workload_input = st.slider("Current Workload (1-10)", 1, 10, 5, key='workload')
+        with col_b:
+            tasks_pending = st.slider("Pending Tasks", 0, 20, 5, key='tasks')
+        
+        analyze_button = st.button("🔍 Analyze Emotion", type="primary", use_container_width=True)
     
     with col2:
-        st.subheader("Examples")
-        st.code("Happy: 'Love this!'\nStressed: 'Overwhelmed'\nTired: 'Need rest'")
+        st.subheader("💡 Try These Examples")
+        example_texts = {
+            "😊 Happy": "I absolutely love this project! Everything is going perfectly and I'm excited about the results!",
+            "😰 Stressed": "I'm completely overwhelmed with deadlines. Too much work and not enough time. Need urgent help!",
+            "😴 Tired": "Feeling exhausted after working all day. Need some rest and break time.",
+            "😐 Neutral": "Working on the usual tasks today. Nothing special happening."
+        }
+        
+        for label, text in example_texts.items():
+            if st.button(label, key=f'ex_{label}'):
+                st.session_state.emotion_text = text
+                st.rerun()
+    
+    if analyze_button and user_text:
+        result = detect_emotion(user_text, workload_input)
+        
+        # Enhanced sentiment calculation
+        from textblob import TextBlob
+        blob = TextBlob(str(user_text))
+        polarity = blob.sentiment.polarity
+        subjectivity = blob.sentiment.subjectivity
+        
+        # Adjust sentiment based on workload and tasks
+        workload_factor = (workload_input - 5) / 10
+        task_factor = (tasks_pending - 10) / 20
+        adjusted_sentiment = polarity - (workload_factor * 0.3) - (task_factor * 0.2)
+        adjusted_sentiment = max(-1, min(1, adjusted_sentiment))
+        
+        st.markdown("---")
+        st.markdown("### 📊 Analysis Results")
+        
+        # Main metrics
+        col_a, col_b, col_c, col_d = st.columns(4)
+        
+        mood_colors = {'Happy':'#4caf50', 'Calm':'#2196f3', 'Neutral':'#9e9e9e', 
+                      'Tired':'#ff9800', 'Stressed':'#f44336'}
+        mood_color = mood_colors.get(result['mood'], '#000')
+        
+        with col_a:
+            st.markdown("#### Mood")
+            st.markdown(f"<h1 style='color:{mood_color};text-align:center'>{result['mood']}</h1>", unsafe_allow_html=True)
+        with col_b:
+            st.markdown("#### Confidence")
+            st.markdown(f"<h1 style='text-align:center'>{result['confidence']*100:.0f}%</h1>", unsafe_allow_html=True)
+            st.progress(result['confidence'])
+        with col_c:
+            st.markdown("#### Sentiment")
+            emoji = "😊" if adjusted_sentiment>0.3 else ("😐" if adjusted_sentiment>-0.3 else "😔")
+            st.markdown(f"<h1 style='text-align:center'>{adjusted_sentiment:+.3f} {emoji}</h1>", unsafe_allow_html=True)
+        with col_d:
+            st.markdown("#### Subjectivity")
+            st.markdown(f"<h1 style='text-align:center'>{subjectivity:.2f}</h1>", unsafe_allow_html=True)
+            st.progress(subjectivity)
+        
+        st.markdown("---")
+        
+        # Visualizations
+        col1, col2, col3 = st.columns(3)
+        
+        with col1:
+            st.subheader("📊 Sentiment Gauge")
+            fig, ax = plt.subplots(figsize=(5, 3))
+            sentiment_norm = (adjusted_sentiment + 1) / 2
+            colors = ['#f44336', '#ff9800', '#ffeb3b', '#8bc34a', '#4caf50']
+            theta = np.linspace(0, np.pi, 100)
+            for i, color in enumerate(colors):
+                start, end = i*np.pi/5, (i+1)*np.pi/5
+                theta_sec = np.linspace(start, end, 20)
+                ax.fill_between(theta_sec, 0, 1, color=color, alpha=0.7)
+            angle = sentiment_norm * np.pi
+            ax.plot([angle, angle], [0, 0.8], 'k-', linewidth=3)
+            ax.plot(angle, 0.8, 'ko', markersize=8)
+            ax.set_ylim(0, 1)
+            ax.set_xlim(0, np.pi)
+            ax.axis('off')
+            ax.text(0, -0.1, 'Neg', ha='left', fontsize=8)
+            ax.text(np.pi, -0.1, 'Pos', ha='right', fontsize=8)
+            ax.text(np.pi/2, 0.35, f'{adjusted_sentiment:+.3f}', ha='center', fontsize=14, fontweight='bold')
+            st.pyplot(fig)
+            plt.close()
+        
+        with col2:
+            st.subheader("🎯 Confidence")
+            fig, ax = plt.subplots(figsize=(5, 3))
+            data = [result['confidence'], 1-result['confidence']]
+            colors_pie = ['#4caf50', '#e0e0e0']
+            ax.pie(data, labels=['Confident', 'Uncertain'], autopct='%1.0f%%', 
+                  colors=colors_pie, startangle=90)
+            st.pyplot(fig)
+            plt.close()
+        
+        with col3:
+            st.subheader("😊 Emotion Spectrum")
+            fig, ax = plt.subplots(figsize=(5, 3))
+            moods = ['Happy', 'Calm', 'Neutral', 'Tired', 'Stressed']
+            probs = [(result['confidence'] if m==result['mood'] else (1-result['confidence'])/4) for m in moods]
+            colors_bar = [mood_colors.get(m, 'gray') for m in moods]
+            ax.barh(moods, probs, color=colors_bar)
+            ax.set_xlim(0, 1)
+            ax.grid(True, alpha=0.3, axis='x')
+            st.pyplot(fig)
+            plt.close()
+        
+        st.markdown("---")
+        
+        # Recommendations
+        if result['mood'] == 'Stressed':
+            st.error("🚨 High stress! Take 15-min break, deep breathing, talk to someone")
+        elif result['mood'] == 'Happy':
+            st.success("😊 Great mood! Perfect for complex/creative tasks")
+        elif result['mood'] == 'Tired':
+            st.warning("😴 Low energy - Take power nap, get caffeine, fresh air")
+        else:
+            st.info(f"😐 {result['mood']} state detected")
+    
+    elif not user_text and analyze_button:
+        st.warning("⚠️ Please enter text")
 
 # PAGE 3: TASK PREDICTOR
 elif page == "🔮 Task Predictor":
