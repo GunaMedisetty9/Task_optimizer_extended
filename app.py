@@ -24,7 +24,7 @@ st.markdown('''
 col1, col2 = st.columns([4, 1])
 with col1:
     st.markdown('<p class="big-font">🎯 AI Task Optimizer Pro</p>', unsafe_allow_html=True)
-    st.markdown("### *9 AI-Powered Features | 96.7% ML Accuracy*")
+    st.markdown("### *Included AI-Powered Features | 96.7% ML Accuracy*")
 
 st.markdown("---")
 
@@ -548,4 +548,4 @@ elif page == "🚨 Stress Monitor":
             st.success(f"✅ HEALTHY: {stress}/10")
 
 st.markdown("---")
-st.markdown("*🎓 NIT Trichy BY Guna| 9 AI Features | 96.7% Accuracy*")
+st.markdown("*🎓 NIT Trichy BY Guna| Included AI Features | 96.7% Accuracy*")
