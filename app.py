@@ -440,4 +440,4 @@ elif page == "🚨 Stress Monitor":
             st.success(f"✅ HEALTHY: {stress}/10")
 
 st.markdown("---")
-st.markdown("*🎓 NIT Trichy | 9 AI Features | 96.7% Accuracy*")
+st.markdown("*🎓 NIT Trichy BY Guna| 9 AI Features | 96.7% Accuracy*")
