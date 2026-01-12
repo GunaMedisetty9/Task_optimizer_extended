@@ -1,0 +1,6 @@
+department,health_score,avg_stress,top_mood
+Marketing,53.8,6.233440514469453,Neutral
+Operations,55.5,6.023404255319149,Neutral
+Sales,53.2,6.210884353741497,Neutral
+HR,53.7,6.231985294117647,Tired
+Engineering,54.5,6.118487394957984,Neutral

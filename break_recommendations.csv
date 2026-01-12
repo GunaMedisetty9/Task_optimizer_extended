@@ -1,0 +1,5 @@
+scenario,break_needed,break_type,break_duration,urgency,activities,urgency_score
+High Stress Overwork,True,Long Break,20,High,"['🚶\u200d♂️ 15-min walk outside', '🧘\u200d♀️ Meditation/Deep breathing', '☕ Coffee with colleague', '🎧 Listen to calming music', '💪 Light stretching exercises']",10
+Moderate Work,True,Micro Break,5,Low,"['💧 Drink water', '👀 Close eyes for 30 seconds', '🙆 Neck & shoulder rolls', '🌬️ 3 deep breaths', '🚶 Stand and walk for 2 min']",3
+Fresh Start,False,Continue Working,0,None,"[""✅ You're doing great! Continue productive work.""]",0
+Tired Employee,True,Long Break,20,High,"['🚶\u200d♂️ 15-min walk outside', '🧘\u200d♀️ Meditation/Deep breathing', '☕ Coffee with colleague', '🎧 Listen to calming music', '💪 Light stretching exercises']",7
