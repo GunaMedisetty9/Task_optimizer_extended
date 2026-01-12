@@ -24,7 +24,7 @@ st.markdown('''
 col1, col2 = st.columns([4, 1])
 with col1:
     st.markdown('<p class="big-font">🎯 AI Task Optimizer Pro</p>', unsafe_allow_html=True)
-    st.markdown("### *Included AI-Powered Features | 96.7% ML Accuracy*")
+    st.markdown("### *AI-Powered Features | 96.7% ML Accuracy*")
 
 st.markdown("---")
 
